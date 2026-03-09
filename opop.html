@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroGuard Pro | Smart Water & Aquaguard Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                    colors: {
+                        brand: { 400: '#00d4ff', 500: '#00b4d8', 600: '#0077b6' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+        body { overflow-x: hidden; }
+        
+        /* Premium Glassmorphism */
+        .premium-glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.05);
+        }
+        .dark .premium-glass {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Nav Items */
+        .nav-item.active {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 3px solid #00d4ff;
+            color: #00b4d8;
+            font-weight: 700;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #00d4ff;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200 antialiased min-h-screen flex">
+
+    <div id="loginSection" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-6">
+        <div class="premium-glass p-10 rounded-[2rem] max-w-md w-full text-center">
+            <div class="mb-6 inline-flex p-4 rounded-3xl bg-brand-500/10 text-brand-500 ring-1 ring-brand-500/30">
+                <span class="material-symbols-outlined scale-[2]">waves</span>
+            </div>
+            <h1 class="text-3xl font-extrabold mb-1">HydroGuard <span class="text-brand-500">Pro</span></h1>
+            <p class="text-slate-500 dark:text-slate-400 text-xs mb-8 tracking-widest uppercase font-semibold">Bluetooth Telemetry System</p>
+            
+            <form id="loginForm" class="space-y-4">
+                <input type="text" id="user" placeholder="Admin ID" required class="w-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium">
+                <input type="password" id="pass" placeholder="Password" required class="w-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium">
+                <p id="loginErr" class="text-red-500 dark:text-red-400 text-xs hidden font-bold">Authentication Failed.</p>
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 text-white py-4 rounded-xl font-bold uppercase tracking-widest mt-4 shadow-lg shadow-brand-500/30 transition-all active:scale-95">Access Terminal</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboardApp" class="hidden flex w-full h-screen overflow-hidden">
+        
+        <aside class="w-72 premium-glass border-r border-slate-200 dark:border-slate-800 flex flex-col p-6 z-50 transition-colors">
+            <div class="flex items-center justify-between mb-10 px-2">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-brand-500 text-3xl">water_drop</span>
+                    <span class="font-extrabold text-xl tracking-tight">HydroGuard</span>
+                </div>
+            </div>
+
+            <nav class="space-y-3 flex-1">
+                <button onclick="nav('page-home', this)" class="nav-item active w-full flex items-center gap-4 p-4 rounded-xl transition-all font-semibold">
+                    <span class="material-symbols-outlined">dashboard</span> Command Center
+                </button>
+                <button onclick="nav('page-tech', this)" class="nav-item w-full flex items-center gap-4 p-4 rounded-xl transition-all text-slate-600 dark:text-slate-400 font-semibold hover:bg-slate-200/50 dark:hover:bg-slate-800/50">
+                    <span class="material-symbols-outlined">engineering</span> Service Hub
+                </button>
+            </nav>
+
+            <div class="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                <div class="flex items-center justify-between px-2">
+                    <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">UI Vibe</span>
+                    <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-brand-500 transition-colors shadow-sm">
+                        <span id="themeIcon" class="material-symbols-outlined">light_mode</span>
+                    </button>
+                </div>
+                <button onclick="location.reload()" class="w-full flex items-center gap-4 p-4 text-slate-500 hover:text-red-500 transition-colors font-bold rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10">
+                    <span class="material-symbols-outlined">logout</span> Disconnect
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-8 lg:p-10 relative">
+            
+            <section id="page-home" class="max-w-7xl mx-auto space-y-8">
+                <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <h2 class="text-4xl font-extrabold mb-1">Telemetry Dashboard</h2>
+                        <p class="text-slate-500 font-medium flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Bluetooth Motor Linked
+                        </p>
+                    </div>
+                    <button id="monBtn" onclick="toggleMon()" class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3.5 rounded-xl font-bold flex items-center gap-3 shadow-xl hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined">sensors</span> Start Scanning
+                    </button>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="premium-glass p-6 rounded-[2rem]">
+                        <p class="text-slate-500 text-xs font-bold uppercase mb-2 tracking-wider">Live Flow Rate</p>
+                        <h3 id="statFlow" class="text-4xl font-black text-brand-500">0.0 <span class="text-lg font-medium text-slate-400">L/h</span></h3>
+                    </div>
+                    <div class="premium-glass p-6 rounded-[2rem]">
+                        <p class="text-slate-500 text-xs font-bold uppercase mb-2 tracking-wider">Total Consumed</p>
+                        <h3 id="statUsage" class="text-4xl font-black">0.0 <span class="text-lg font-medium text-slate-400">L</span></h3>
+                    </div>
+                    <div class="premium-glass p-6 rounded-[2rem]">
+                        <p class="text-slate-500 text-xs font-bold uppercase mb-2 tracking-wider">Wastage Events</p>
+                        <h3 id="statAlerts" class="text-4xl font-black text-orange-500">0</h3>
+                    </div>
+                    <div class="premium-glass p-6 rounded-[2rem]">
+                        <p class="text-slate-500 text-xs font-bold uppercase mb-2 tracking-wider">Motor Signal</p>
+                        <h3 class="text-4xl font-black text-emerald-500">Good</h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 premium-glass rounded-[2rem] p-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 class="font-bold text-xl">Consumption Matrix</h4>
+                        </div>
+                        <div class="h-[300px]"><canvas id="mainChart"></canvas></div>
+                    </div>
+
+                    <div class="premium-glass p-8 rounded-[2rem] flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-xl mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-brand-500">tune</span> Limit Controls</h4>
+                            
+                            <div class="mb-8 bg-slate-100 dark:bg-slate-800/50 p-5 rounded-2xl">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="font-bold text-sm text-slate-600 dark:text-slate-300">Wastage Threshold</span>
+                                    <span id="thresholdVal" class="bg-brand-500/20 text-brand-600 dark:text-brand-400 px-3 py-1 rounded-lg font-black text-sm">85 L/h</span>
+                                </div>
+                                <input type="range" id="thresholdSlider" min="20" max="150" value="85" class="w-full h-2 bg-slate-300 dark:bg-slate-700 rounded-lg">
+                                <div class="flex justify-between text-[10px] font-bold text-slate-400 mt-2">
+                                    <span>20L (Strict)</span>
+                                    <span>150L (Relaxed)</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-5">
+                                <div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                    <span class="font-bold text-sm">Auto-Kill Motor on Limit</span>
+                                    <input type="checkbox" checked class="w-6 h-6 accent-brand-500 rounded cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-tech" class="hidden max-w-5xl mx-auto py-10">
+                <div class="text-center mb-12">
+                    <h2 class="text-5xl font-black mb-4">Maintenance Routing</h2>
+                    <p class="text-slate-500 font-medium text-lg">Dispatch technicians to your system location</p>
+                </div>
+                
+                <div class="premium-glass p-4 rounded-2xl flex flex-col md:flex-row gap-4 mb-12">
+                    <select id="issueSelect" class="flex-1 bg-transparent border-none p-4 font-bold text-lg focus:outline-none focus:ring-0 text-slate-700 dark:text-slate-200">
+                        <option value="" class="text-black">Select Hardware Issue...</option>
+                        <option value="motor" class="text-black">Bluetooth Motor Repair & Sync</option>
+                        <option value="leak" class="text-black">Pipe Integrity & Leak Check</option>
+                        <option value="aquaguard" class="text-black">Aquaguard / RO Filter Replacement</option>
+                        <option value="sensor" class="text-black">Water Level Sensor Calibration</option>
+                        <option value="tank" class="text-black">Tank Deep Clean & Sterilization</option>
+                    </select>
+                    <div class="w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
+                    <select id="locSelect" class="flex-1 bg-transparent border-none p-4 font-bold text-lg focus:outline-none focus:ring-0 text-slate-700 dark:text-slate-200">
+                        <option value="" class="text-black">Select Area...</option>
+                        <option value="kuk" class="text-black">Kukatpally</option>
+                        <option value="hyd" class="text-black">Hyderabad Central</option>
+                        <option value="sec" class="text-black">Secunderabad</option>
+                        <option value="med" class="text-black">Medchal</option>
+                    </select>
+                    <button onclick="findTech()" class="bg-brand-500 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-brand-400 transition-colors active:scale-95">Find Technicians</button>
+                </div>
+
+                <div id="techGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="toastContainer" class="fixed bottom-8 right-8 z-[200] space-y-4"></div>
+
+    <script>
+        // System State
+        const STATE = {
+            isMon: false,
+            flowData: Array(15).fill(0),
+            alerts: 0,
+            usage: 0,
+            threshold: 85,
+            chart: null
+        };
+
+        // Mock Database for Technicians
+        const TECHNICIANS = [
+            { 
+                id: 1, 
+                name: "Rajesh Kumar", 
+                role: "IoT Sensor & Bluetooth Specialist", 
+                tags: "Motor Expert",
+                slots: ["09:00 AM", "11:30 AM", "02:00 PM", "04:30 PM"] 
+            },
+            { 
+                id: 2, 
+                name: "Priya Sharma", 
+                role: "Aquaguard Certified Technician", 
+                tags: "RO & Purifiers",
+                slots: ["10:00 AM", "01:00 PM", "03:00 PM"] 
+            },
+            { 
+                id: 3, 
+                name: "Suresh Reddy", 
+                role: "Plumbing & Leak Detection Pro", 
+                tags: "Fast Response",
+                slots: ["08:30 AM", "12:00 PM"] 
+            }
+        ];
+
+        // Theme Logic
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            document.getElementById('themeIcon').innerText = isDark ? 'light_mode' : 'dark_mode';
+            
+            // Update Chart Colors dynamically
+            if(STATE.chart) {
+                const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                const textColor = isDark ? '#94a3b8' : '#64748b';
+                STATE.chart.options.scales.x.ticks.color = textColor;
+                STATE.chart.options.scales.y.ticks.color = textColor;
+                STATE.chart.options.scales.y.grid.color = gridColor;
+                STATE.chart.update();
+            }
+        }
+
+        // Login UI Handling
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardApp').classList.remove('hidden');
+            initChart();
+            showToast('Bluetooth Connection Established', 'System Online');
+        };
+
+        // Threshold Slider Handling
+        document.getElementById('thresholdSlider').addEventListener('input', (e) => {
+            STATE.threshold = parseInt(e.target.value);
+            document.getElementById('thresholdVal').innerText = STATE.threshold + ' L/h';
+        });
+
+        // Initialize Telemetry Chart
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            const grad = ctx.createLinearGradient(0, 0, 0, 300);
+            grad.addColorStop(0, 'rgba(0, 212, 255, 0.4)');
+            grad.addColorStop(1, 'rgba(0, 212, 255, 0)');
+
+            STATE.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(15).fill('').map((_, i) => `${(14-i)*2}s ago`).reverse(),
+                    datasets: [{
+                        data: STATE.flowData,
+                        borderColor: '#00d4ff',
+                        borderWidth: 4,
+                        fill: true,
+                        backgroundColor: grad,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#00d4ff',
+                        pointRadius: 0,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: isDark ? '#94a3b8' : '#64748b' } },
+                        y: { 
+                            grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }, 
+                            ticks: { color: isDark ? '#94a3b8' : '#64748b' },
+                            suggestedMax: 100 
+                        }
+                    }
+                }
+            });
+        }
+
+        // Telemetry Data Simulation
+        function toggleMon() {
+            STATE.isMon = !STATE.isMon;
+            const btn = document.getElementById('monBtn');
+            btn.innerHTML = STATE.isMon ? 
+                '<span class="material-symbols-outlined text-red-500">stop_circle</span> Halt Motor' : 
+                '<span class="material-symbols-outlined text-emerald-500">sensors</span> Start Scanning';
+            
+            if(STATE.isMon) STATE.interval = setInterval(updateData, 2000);
+            else clearInterval(STATE.interval);
+        }
+
+        function updateData() {
+            // Simulate realistic AC motor flow variation
+            let target = STATE.isMon ? 60 : 0;
+            let drift = (Math.random() - 0.5) * 20;
+            
+            // Random spike simulation
+            if(Math.random() > 0.85) drift += 40; 
+            
+            let newVal = Math.max(0, target + drift);
+            
+            STATE.flowData.push(newVal);
+            STATE.flowData.shift();
+            
+            document.getElementById('statFlow').innerHTML = `${newVal.toFixed(1)} <span class="text-lg font-medium text-slate-400">L/h</span>`;
+            
+            STATE.usage += (newVal / 3600); // L/s accumulation
+            document.getElementById('statUsage').innerHTML = `${STATE.usage.toFixed(2)} <span class="text-lg font-medium text-slate-400">L</span>`;
+            
+            STATE.chart.data.datasets[0].data = STATE.flowData;
+            STATE.chart.update('none');
+
+            // Threshold limit check
+            if(newVal > STATE.threshold) triggerAlert(newVal);
+        }
+
+        // Notification Engine
+        function triggerAlert(val) {
+            STATE.alerts++;
+            document.getElementById('statAlerts').innerText = STATE.alerts;
+            showToast(`Flow rate hit ${val.toFixed(1)} L/h. Exceeds limit of ${STATE.threshold} L/h!`, '⚠️ Wastage Detected', 'orange');
+        }
+
+        function showToast(msg, title, color = 'brand') {
+            const toast = document.createElement('div');
+            toast.className = `premium-glass border-l-4 border-${color}-500 p-5 rounded-2xl shadow-2xl min-w-[320px] transform transition-all duration-300 translate-x-0`;
+            toast.innerHTML = `<h5 class="font-extrabold text-sm text-${color}-500 uppercase tracking-widest mb-1">${title}</h5><p class="text-sm font-medium">${msg}</p>`;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Navigation Engine
+        function nav(pageId, btn) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => {
+                n.classList.remove('active', 'bg-brand-500/10', 'border-l-4', 'text-brand-500');
+                n.classList.add('text-slate-600', 'dark:text-slate-400');
+            });
+            btn.classList.add('active');
+            btn.classList.remove('text-slate-600', 'dark:text-slate-400');
+        }
+
+        // Service Hub Engine
+        function findTech() {
+            const loc = document.getElementById('locSelect').value;
+            const issue = document.getElementById('issueSelect').value;
+            const grid = document.getElementById('techGrid');
+            
+            if(!issue || !loc) {
+                return showToast('Please select both an issue and an area.', 'Missing Info', 'orange');
+            }
+
+            grid.innerHTML = '<div class="col-span-full text-center p-12"><span class="animate-spin material-symbols-outlined scale-150 text-brand-500">sync</span></div>';
+            
+            // Network Simulation
+            setTimeout(() => {
+                const areaName = document.getElementById('locSelect').options[document.getElementById('locSelect').selectedIndex].text;
+                renderTechnicians(areaName);
+            }, 800);
+        }
+
+        function renderTechnicians(areaName) {
+            const grid = document.getElementById('techGrid');
+            grid.innerHTML = TECHNICIANS.map(tech => `
+                <div class="premium-glass p-6 rounded-[2rem] hover:ring-2 hover:ring-brand-500 transition-all group flex flex-col justify-between shadow-sm">
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider">Area: ${areaName}</span>
+                            <span class="text-xs font-bold text-slate-400 bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded">${tech.tags}</span>
+                        </div>
+                        <h4 class="text-2xl font-black mb-1">${tech.name}</h4>
+                        <p class="text-slate-600 dark:text-slate-400 font-medium mb-6">${tech.role}</p>
+                    </div>
+                    
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-4 mt-2">
+                        <p class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Available Time Slots:</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${tech.slots.length > 0 
+                                ? tech.slots.map(slot => `
+                                    <button onclick="bookSlot(${tech.id}, '${slot}')" class="px-4 py-2 rounded-xl border-2 border-brand-500 text-brand-600 dark:text-brand-400 font-bold text-xs hover:bg-brand-500 hover:text-white transition-all active:scale-95">
+                                        ${slot}
+                                    </button>
+                                  `).join('')
+                                : `<span class="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-500 rounded-xl font-bold text-xs">Fully Booked Today</span>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function bookSlot(techId, slotTime) {
+            const techIndex = TECHNICIANS.findIndex(t => t.id === techId);
+            
+            if (techIndex !== -1) {
+                // Remove the selected slot
+                TECHNICIANS[techIndex].slots = TECHNICIANS[techIndex].slots.filter(s => s !== slotTime);
+                
+                // Re-render UI
+                const areaName = document.getElementById('locSelect').options[document.getElementById('locSelect').selectedIndex].text;
+                renderTechnicians(areaName);
+                
+                // Notify User
+                showToast(`Appointment confirmed for ${slotTime} with ${TECHNICIANS[techIndex].name}.`, '✅ Booking Successful', 'emerald');
+            }
+        }
+    </script>
+</body>
+</html>
